@@ -4,7 +4,7 @@ importers={}
 def load_module(name):
     try: importers[name] = __import__(f"modules.{name}",fromlist=[name])
     except Exception as e: st.sidebar.warning(f"'{name}' module failed.",icon="⚠️"); importers[name]=None
-[load_module(n) for n in ["news_fetcher","arxiv_fetcher","Google Search_fetcher","summarizer","beehiiv_api"]]
+[load_module(n) for n in ["news_fetcher","arxiv_fetcher","google_search_fetcher","summarizer","beehiiv_api"]]
 st.title("💡 Newsletter OS")
 @st.cache_resource
 def load_config():
@@ -13,13 +13,13 @@ try: api_keys=load_config(); storage.init_db()
 except Exception as e: st.error(f"Config error: {e}"); st.stop()
 with st.sidebar:
     st.header("1. Data Gathering"); q=st.text_input("Search Topic","longevity research")
-    use_g=st.checkbox("Google",1,disabled=not importers["Google Search_fetcher"])
+    use_g=st.checkbox("Google",1,disabled=not importers["google_search_fetcher"])
     use_n=st.checkbox("News",1,disabled=not importers["news_fetcher"])
     use_a=st.checkbox("ArXiv",1,disabled=not importers["arxiv_fetcher"])
     if st.button("Fetch & Digest",type="primary"):
         with st.spinner("Contacting sources..."):
             dfs=[]
-            if use_g and importers["Google Search_fetcher"]: dfs.append(importers["Google Search_fetcher"].fetch_Google Search(api_keys['google_api_key'],api_keys['google_cse_id'],q))
+            if use_g and importers["google_search_fetcher"]: dfs.append(importers["google_search_fetcher"].fetch_google_search(api_keys['google_api_key'],api_keys['google_cse_id'],q))
             if use_n and importers["news_fetcher"]: dfs.append(importers["news_fetcher"].fetch_news(api_keys['news_api_key'],q))
             if use_a and importers["arxiv_fetcher"]: dfs.append(importers["arxiv_fetcher"].fetch_arxiv(q))
             if dfs:
@@ -40,8 +40,8 @@ if not curated_df.empty:
     for _,r in curated_df.iterrows():
         with st.container(border=True):
             st.markdown(f"**Article:** {r['title']}")
-            if importers["Google Search_fetcher"]:
-                imgs=importers["Google Search_fetcher"].fetch_google_images(api_keys['google_api_key'],api_keys['google_cse_id'],r['keywords']or r['title'])
+            if importers["google_search_fetcher"]:
+                imgs=importers["google_search_fetcher"].fetch_google_images(api_keys['google_api_key'],api_keys['google_cse_id'],r['keywords']or r['title'])
                 if not imgs.empty:
                     urls=["None"]+imgs['image_url'].tolist(); st.image(urls[1:],width=100)
                     st.session_state.imgs[r['id']]=st.radio("Img:",urls,key=f"r_{r['id']}",horizontal=True,format_func=lambda x:"None" if x=="None" else f"Img {urls.index(x)}")
