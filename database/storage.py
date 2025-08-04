@@ -11,4 +11,7 @@ def store_articles(df):
 def get_articles_by_status(s='new'):
     with sqlite3.connect(DB_PATH) as c: return pd.read_sql(f"SELECT * FROM articles WHERE status='{s}' ORDER BY fetch_date DESC", c)
 def update_article_status(ids,s='selected'):
-    with sqlite3.connect(DB_PATH) as c:c.execute(f"UPDATE articles SET status='{s}' WHERE id IN ('{"','".join(ids)}')")
+    with sqlite3.connect(DB_PATH) as c:
+        placeholders = ','.join('?' for _ in ids)
+        query = f"UPDATE articles SET status=? WHERE id IN ({placeholders})"
+        c.execute(query, [s] + ids)
