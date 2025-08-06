@@ -72,3 +72,4 @@ watchdog
 Wikipedia-API==0.8.1
 zipp
 zstandard==0.23.0
+flake8
