@@ -1,0 +1,15 @@
+name: Gemini AI Assistant
+on:
+  issues:
+    types: [opened, edited]
+  pull_request:
+    types: [opened, reopened, synchronize]
+jobs:
+  gemini:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Gemini CLI
+        uses: google-github-actions/run-gemini-cli@latest
+        with:
+          api_key: ${{ secrets.GOOGLE_API_KEY }}
