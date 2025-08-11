@@ -15,3 +15,7 @@ def update_article_status(ids,s='selected'):
         placeholders = ','.join('?' for _ in ids)
         query = f"UPDATE articles SET status=? WHERE id IN ({placeholders})"
         c.execute(query, [s] + ids)
+
+def update_article_summary(article_id, new_summary):
+    with sqlite3.connect(DB_PATH) as c:
+        c.execute("UPDATE articles SET summary=? WHERE id=?", (new_summary, article_id))
