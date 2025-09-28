@@ -31,7 +31,14 @@ if not new_df.empty:
     selected={r['id']:st.checkbox(f"**{r['title']}**",key=r['id']) for _,r in new_df.iterrows()}
     for _,r in new_df.iterrows():
         if selected[r['id']]:
-            with st.container(border=True): st.caption(f"{r['source']} | {r['keywords']}"); st.markdown(r['summary'])
+            with st.container(border=True):
+                st.caption(f"{r['source']} | {r['keywords']}")
+                new_summary = st.text_area("Summary", r['summary'], key=f"summary_{r['id']}")
+                if st.button("Save Summary", key=f"save_{r['id']}"):
+                    storage.update_article_summary(r['id'], new_summary)
+                    st.success("Summary updated!")
+                    st.rerun()
+
     if st.button("Queue Selected"): storage.update_article_status([i for i,s in selected.items() if s],'selected'); st.rerun()
 st.header("3. Publication"); curated_df=storage.get_articles_by_status('selected')
 if not curated_df.empty:
